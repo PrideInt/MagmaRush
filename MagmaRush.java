@@ -5,6 +5,7 @@ import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.LavaAbility;
 import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
+import com.projectkorra.projectkorra.region.RegionProtection;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempBlock;
@@ -62,7 +63,7 @@ public class MagmaRush extends LavaAbility implements AddonAbility {
 			return;
 		} else if (!bPlayer.canLavabend()) {
 			return;
-		} else if (!GeneralMethods.isRegionProtectedFromBuild(this, player.getLocation())) {
+		} else if (!RegionProtection.isRegionProtected(player, player.getLocation(), this)) {
 			return;
 		}
 		this.cooldown = ConfigManager.getConfig().getLong(path + "Cooldown");
@@ -77,7 +78,7 @@ public class MagmaRush extends LavaAbility implements AddonAbility {
 		this.target = rayTraceBlock(player, this.select_range);
 		
 		if (this.target == null) return;
-		if (GeneralMethods.isRegionProtectedFromBuild(this, this.target.getLocation())) {
+		if (RegionProtection.isRegionProtected(player, this.target.getLocation(), this)) {
 			return;
 		}
 		
@@ -87,14 +88,14 @@ public class MagmaRush extends LavaAbility implements AddonAbility {
 		this.lavaBlocks =
 				GeneralMethods.getBlocksAroundPoint(this.origin.clone(), 1.75)
 						.stream()
-						.filter(b -> (isAir(b.getRelative(BlockFace.UP).getType()) || isPlant(b.getRelative(BlockFace.UP))) && isEarthbendable(b) && !isIndestructible(b) && !GeneralMethods.isRegionProtectedFromBuild(this, b.getLocation()))
+						.filter(b -> (isAir(b.getRelative(BlockFace.UP).getType()) || isPlant(b.getRelative(BlockFace.UP))) && isEarthbendable(b) && !isIndestructible(b) && !RegionProtection.isRegionProtected(player, b.getLocation(), this))
 						.collect(Collectors.toList());
 		this.indices = new HashSet<>();
 		this.magmaBlocks = new HashSet<>();
 		
-		if (GeneralMethods.isRegionProtectedFromBuild(this, this.target.getLocation())) {
+		if (RegionProtection.isRegionProtected(player, this.target.getLocation(), this)) {
 			return;
-		} else if (GeneralMethods.isRegionProtectedFromBuild(this, player.getLocation())) {
+		} else if (RegionProtection.isRegionProtected(player, player.getLocation(), this)) {
 			return;
 		}
 		playEarthbendingSound(this.origin);
@@ -204,7 +205,7 @@ public class MagmaRush extends LavaAbility implements AddonAbility {
 		return GeneralMethods.getBlocksAroundPoint(location, 1.75)
 				.stream()
 				.filter(b -> (isAir(b.getRelative(BlockFace.UP).getType()) || (isPlant(b.getRelative(BlockFace.UP)) && !isLeaves(b.getRelative(BlockFace.UP))) && !isWood(b.getRelative(BlockFace.UP)))
-							&& isEarthbendable(b) && !isIndestructible(b) && !GeneralMethods.isRegionProtectedFromBuild(this, b.getLocation()))
+							&& isEarthbendable(b) && !isIndestructible(b) && !RegionProtection.isRegionProtected(player, b.getLocation(), this))
 				.map(b -> (Location) b.getRelative(BlockFace.UP).getLocation().clone())
 				.collect(Collectors.toList());
 	}
